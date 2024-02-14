@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+cat samples_list | while read sample
+do
+echo "Analysing Coverage: ${sample}"
+# Adding Read groups
+java -jar "/home/juno/PICARD/picard.jar" AddOrReplaceReadGroups \
+      I=${sample}.bam \
+      O=RG_PICARD/${sample}_RG_picard.bam \
+      RGID=${sample} \
+      RGLB=WGA \
+      RGPL=Illumina \
+      RGPU=Mouse \
+      RGSM=${sample} &&
+ samtools sort RG_PICARD/${sample}_RG_picard.bam -o RG_PICARD/sorted_${sample}.bam &&
+ samtools index RG_PICARD/sorted_${sample}.bam &&
+
+# Removing Duplicates
+java -jar "/home/juno/PICARD/picard.jar" MarkDuplicates \
+       INPUT=RG_PICARD/sorted_${sample}.bam \
+       OUTPUT=RG_PICARD/FINAL_BAM/${sample}_final.bam \
+       METRICS_FILE=RG_PICARD/FINAL_BAM/${sample}_dupl_metrics.txt
+
+# Indexing the final sorted bam  files
+ samtools index RG_PICARD/FINAL_BAM/${sample}_final.bam
+
+# Calculating the coverge to determine the numbers of reads
+ samtools coverage RG_PICARD/FINAL_BAM/${sample}_final.bam >> RG_PICARD/FINAL_COV/sam_f_cov_${sample}.tsv
+
+#samtools coverage RG_PICARD/sorted_${sample}.bam >> All_sam_cov.tsv
+
+
+rm RG_PICARD/sorted*
+done
