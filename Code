@@ -4,7 +4,7 @@ cat samples_list | while read sample
 do
 echo "Analysing Coverage: ${sample}"
 # Adding Read groups
-java -jar "/home/juno/PICARD/picard.jar" AddOrReplaceReadGroups \
+java -jar "/home/kk/PICARD/picard.jar" AddOrReplaceReadGroups \
       I=${sample}.bam \
       O=RG_PICARD/${sample}_RG_picard.bam \
       RGID=${sample} \
@@ -16,7 +16,7 @@ java -jar "/home/juno/PICARD/picard.jar" AddOrReplaceReadGroups \
  samtools index RG_PICARD/sorted_${sample}.bam &&
 
 # Removing Duplicates
-java -jar "/home/juno/PICARD/picard.jar" MarkDuplicates \
+java -jar "/home/kk/PICARD/picard.jar" MarkDuplicates \
        INPUT=RG_PICARD/sorted_${sample}.bam \
        OUTPUT=RG_PICARD/FINAL_BAM/${sample}_final.bam \
        METRICS_FILE=RG_PICARD/FINAL_BAM/${sample}_dupl_metrics.txt
